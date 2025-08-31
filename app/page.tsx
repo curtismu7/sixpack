@@ -181,7 +181,7 @@ const SectionHeader: React.FC<{ icon?: React.ReactNode; title: string; desc?: st
   return (
     <div className="flex items-start justify-between gap-4">
       <div className="flex items-center gap-3">
-        <div className="p-2 rounded-2xl bg-muted text-foreground">{icon}</div>
+        <div className="p-2 rounded-2xl bg-gradient-to-r from-green-100 to-blue-100">{icon}</div>
         <div>
           <h2 className="text-xl font-semibold leading-tight">{title}</h2>
           {desc && <p className="text-sm text-muted-foreground mt-1">{desc}</p>}
@@ -193,21 +193,21 @@ const SectionHeader: React.FC<{ icon?: React.ReactNode; title: string; desc?: st
 };
 
 const PrintButton = ({ label = "Print this section" }: { label?: string }) => (
-  <Button variant="secondary" onClick={() => window.print()} className="rounded-2xl">🖨️ {label}</Button>
+  <Button variant="secondary" onClick={() => window.print()} className="rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 shadow-lg">🖨️ {label}</Button>
 );
 
 const DownloadButton = ({ href, label }: { href: string; label: string }) => (
   <a href={href} target="_blank" rel="noreferrer">
-    <Button className="rounded-2xl" variant="default"><Download className="w-4 h-4 mr-2" /> {label}</Button>
+    <Button className="rounded-2xl bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 shadow-lg" variant="default"><Download className="w-4 h-4 mr-2" /> {label}</Button>
   </a>
 );
 
 // Weekly table component
 function WeeklyTable() {
   return (
-    <Card className="shadow-sm">
+    <Card className="shadow-lg bg-white/90 backdrop-blur border-green-200">
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg">Weekly Plan (Meals + Workouts)</CardTitle>
+        <CardTitle className="text-lg text-green-700">Weekly Plan (Meals + Workouts)</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
@@ -251,8 +251,8 @@ function WeeklyTable() {
 function QuickView() {
   const rows = days.map((d) => ({ day: d.day, workout: d.workout.title, meals: `Breakfast: Eggs+Yogurt · Lunch: ${d.meals.lunch.split(" + ")[0]} · Dinner: ${d.meals.dinner.split(" + ")[0]}` }));
   return (
-    <Card className="shadow-sm">
-      <CardHeader className="pb-2"><CardTitle className="text-lg">Quick View (Gym‑Friendly)</CardTitle></CardHeader>
+    <Card className="shadow-lg bg-white/90 backdrop-blur border-blue-200">
+      <CardHeader className="pb-2"><CardTitle className="text-lg text-blue-700">Quick View (Gym‑Friendly)</CardTitle></CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
           <Table>
@@ -281,15 +281,23 @@ function QuickView() {
 
 function CalendarView() {
   return (
-    <Card className="shadow-sm">
-      <CardHeader className="pb-2"><CardTitle className="text-lg">Calendar View (4 Weeks, Minimalist)</CardTitle></CardHeader>
+    <Card className="shadow-lg bg-white/90 backdrop-blur border-purple-200">
+      <CardHeader className="pb-2"><CardTitle className="text-lg text-purple-700">Calendar View (4 Weeks, Minimalist)</CardTitle></CardHeader>
       <CardContent>
         <div className="grid grid-cols-7 gap-3 text-sm">
           {["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map((h) => (
             <div key={h} className="text-center font-semibold text-muted-foreground">{h}</div>
           ))}
-          {days.map((d) => (
-            <div key={d.day} className="rounded-2xl border p-3 min-h-[120px]">
+          {days.map((d, index) => (
+            <div key={d.day} className={`rounded-2xl border-2 p-3 min-h-[120px] ${
+              index % 7 === 0 ? 'border-red-200 bg-red-50' :
+              index % 7 === 1 ? 'border-orange-200 bg-orange-50' :
+              index % 7 === 2 ? 'border-yellow-200 bg-yellow-50' :
+              index % 7 === 3 ? 'border-green-200 bg-green-50' :
+              index % 7 === 4 ? 'border-blue-200 bg-blue-50' :
+              index % 7 === 5 ? 'border-indigo-200 bg-indigo-50' :
+              'border-purple-200 bg-purple-50'
+            }`}
               <div className="font-semibold">{d.workout.title.split(" ")[0]}{d.workout.title.includes("Conditioning") ? " (Cond/Core)" : ""}</div>
               <Separator className="my-2" />
               <div className="space-y-1">
@@ -313,8 +321,8 @@ function GroceryList() {
   return (
     <div className="grid md:grid-cols-2 gap-4">
       {Object.entries(grocery).map(([cat, items]) => (
-        <Card key={cat} className="shadow-sm">
-          <CardHeader className="pb-2"><CardTitle className="text-lg">{cat}</CardTitle></CardHeader>
+        <Card key={cat} className="shadow-lg bg-white/90 backdrop-blur border-orange-200">
+          <CardHeader className="pb-2"><CardTitle className="text-lg text-orange-700">{cat}</CardTitle></CardHeader>
           <CardContent className="space-y-2">
             {items.map((item) => (
               <label key={item} className="flex items-center gap-3 text-sm">
@@ -333,9 +341,9 @@ function Trackers() {
   const weekRows = days.map((d) => ({ day: d.day, workout: d.workout.title }));
   return (
     <div className="space-y-4">
-      <Card className="shadow-sm">
+      <Card className="shadow-lg bg-white/90 backdrop-blur border-indigo-200">
         <CardHeader className="pb-2 flex flex-row items-center justify-between">
-          <CardTitle className="text-lg">Weekly Tracking Sheet</CardTitle>
+          <CardTitle className="text-lg text-indigo-700">Weekly Tracking Sheet</CardTitle>
           <PrintButton />
         </CardHeader>
         <CardContent>
@@ -370,8 +378,8 @@ function Trackers() {
         </CardContent>
       </Card>
 
-      <Card className="shadow-sm">
-        <CardHeader className="pb-2"><CardTitle className="text-lg">Snack Options</CardTitle></CardHeader>
+      <Card className="shadow-lg bg-white/90 backdrop-blur border-pink-200">
+        <CardHeader className="pb-2"><CardTitle className="text-lg text-pink-700">Snack Options</CardTitle></CardHeader>
         <CardContent className="grid md:grid-cols-2 gap-2">
           {snackOptions.map((s) => (
             <div key={s} className="text-sm">• {s}</div>
@@ -386,16 +394,16 @@ function Downloads() {
   return (
     <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
       {pdfLinks.map((f) => (
-        <Card key={f.name} className="shadow-sm">
-          <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><FileText className="w-4 h-4"/> {f.name}</CardTitle></CardHeader>
+        <Card key={f.name} className="shadow-lg bg-white/90 backdrop-blur border-teal-200">
+          <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2 text-teal-700"><FileText className="w-4 h-4 text-teal-600"/> {f.name}</CardTitle></CardHeader>
           <CardContent className="flex items-center justify-between">
             <p className="text-xs text-muted-foreground pr-2">Opens as a PDF.</p>
             <DownloadButton href={f.href} label="Download" />
           </CardContent>
         </Card>
       ))}
-      <Card className="shadow-sm">
-        <CardHeader className="pb-2"><CardTitle className="text-base">How to host these PDFs</CardTitle></CardHeader>
+      <Card className="shadow-lg bg-white/90 backdrop-blur border-gray-200">
+        <CardHeader className="pb-2"><CardTitle className="text-base text-gray-700">How to host these PDFs</CardTitle></CardHeader>
         <CardContent className="text-sm text-muted-foreground space-y-2">
           <p>These links work inside ChatGPT. To deploy this site elsewhere, place the PDF files in your <code>/public</code> folder and update the <code>pdfLinks</code> array to point to <code>/your-file.pdf</code>.</p>
           <p>Or remove the downloads section and rely on the on‑page views + browser print as PDF.</p>
@@ -410,12 +418,12 @@ function Downloads() {
 // ---------------------------------------------
 export default function SixPackSite() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/40">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
       {/* Header / Hero */}
-      <header className="sticky top-0 z-30 backdrop-blur supports-[backdrop-filter]:bg-background/70 border-b">
+      <header className="sticky top-0 z-30 backdrop-blur supports-[backdrop-filter]:bg-white/80 border-b border-green-200 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="rounded-2xl p-2 bg-primary/10 text-primary"><Dumbbell className="w-5 h-5"/></div>
+            <div className="rounded-2xl p-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg"><Dumbbell className="w-5 h-5"/></div>
             <div>
               <h1 className="text-lg font-semibold leading-none">Six‑Pack Transformation Program</h1>
               <p className="text-xs text-muted-foreground">Custom plan for 6'3", 187 lbs • 5 workouts/week (4 Lifting + 1 Conditioning)</p>
@@ -423,21 +431,21 @@ export default function SixPackSite() {
           </div>
           <div className="flex items-center gap-2">
             <DownloadButton href={pdfLinks[0].href} label="Download Master PDF" />
-            <Button variant="outline" className="rounded-2xl" onClick={() => window.print()}>🖨️ Print</Button>
+            <Button variant="outline" className="rounded-2xl border-2 border-blue-300 text-blue-700 hover:bg-blue-50 shadow-md" onClick={() => window.print()}>🖨️ Print</Button>
           </div>
         </div>
       </header>
 
       {/* Content */}
       <main className="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
-        <Card className="shadow-sm">
+        <Card className="shadow-lg border-0 bg-white/80 backdrop-blur">
           <CardHeader>
-            <CardTitle className="text-xl">Overview</CardTitle>
+            <CardTitle className="text-xl bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Overview</CardTitle>
           </CardHeader>
           <CardContent className="grid md:grid-cols-3 gap-4">
-            <div className="rounded-2xl border p-4">
-              <SectionHeader icon={<Dumbbell />} title="Training Split" desc="5 days/week: 4 lifting + 1 conditioning & core" />
-              <ul className="list-disc ml-5 mt-3 text-sm space-y-1">
+            <div className="rounded-2xl border-2 border-green-200 p-4 bg-gradient-to-br from-green-50 to-emerald-50">
+              <SectionHeader icon={<Dumbbell className="text-green-600" />} title="Training Split" desc="5 days/week: 4 lifting + 1 conditioning & core" />
+              <ul className="list-disc ml-5 mt-3 text-sm space-y-1 text-green-800">
                 <li>Mon: Push</li>
                 <li>Tue: Pull</li>
                 <li>Wed: Legs & Core</li>
@@ -447,18 +455,18 @@ export default function SixPackSite() {
                 <li>Sun: Rest</li>
               </ul>
             </div>
-            <div className="rounded-2xl border p-4">
-              <SectionHeader icon={<Salad />} title="Nutrition Targets" desc="~2,400 kcal • 190–200g protein/day" />
-              <ul className="list-disc ml-5 mt-3 text-sm space-y-1">
+            <div className="rounded-2xl border-2 border-blue-200 p-4 bg-gradient-to-br from-blue-50 to-cyan-50">
+              <SectionHeader icon={<Salad className="text-blue-600" />} title="Nutrition Targets" desc="~2,400 kcal • 190–200g protein/day" />
+              <ul className="list-disc ml-5 mt-3 text-sm space-y-1 text-blue-800">
                 <li>Breakfast daily: eggs + Greek yogurt (no egg whites)</li>
                 <li>50–60g protein per main meal</li>
                 <li>Carbs higher on lift days, lower on rest days</li>
                 <li>Hydration: 3–4L/day • Sleep: 7–8h</li>
               </ul>
             </div>
-            <div className="rounded-2xl border p-4">
-              <SectionHeader icon={<CalendarDays />} title="Tools" desc="Use Downloads or Print each section" />
-              <ul className="list-disc ml-5 mt-3 text-sm space-y-1">
+            <div className="rounded-2xl border-2 border-purple-200 p-4 bg-gradient-to-br from-purple-50 to-pink-50">
+              <SectionHeader icon={<CalendarDays className="text-purple-600" />} title="Tools" desc="Use Downloads or Print each section" />
+              <ul className="list-disc ml-5 mt-3 text-sm space-y-1 text-purple-800">
                 <li>Weekly plan & quick views</li>
                 <li>Grocery checklist</li>
                 <li>Trackers (weekly / 4‑week / 12‑week)</li>
@@ -469,7 +477,7 @@ export default function SixPackSite() {
         </Card>
 
         <Tabs defaultValue="weekly" className="space-y-4">
-          <TabsList className="grid grid-cols-2 md:grid-cols-6 gap-2 bg-muted p-1 rounded-2xl">
+          <TabsList className="grid grid-cols-2 md:grid-cols-6 gap-2 bg-gradient-to-r from-green-100 to-blue-100 p-1 rounded-2xl shadow-md">
             <TabsTrigger value="weekly">Weekly Plan</TabsTrigger>
             <TabsTrigger value="quick">Quick View</TabsTrigger>
             <TabsTrigger value="calendar">Calendar</TabsTrigger>
@@ -509,8 +517,8 @@ export default function SixPackSite() {
           </TabsContent>
         </Tabs>
 
-        <Card className="shadow-sm">
-          <CardContent className="text-xs text-muted-foreground p-4">
+        <Card className="shadow-lg bg-white/90 backdrop-blur border-yellow-200">
+          <CardContent className="text-xs text-yellow-800 p-4">
             <p><strong>Disclaimer:</strong> This plan is general fitness guidance. Consult a healthcare professional before starting any new diet or training program, especially if you have medical conditions.</p>
           </CardContent>
         </Card>
