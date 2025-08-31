@@ -297,7 +297,7 @@ function CalendarView() {
               index % 7 === 4 ? 'border-blue-200 bg-blue-50' :
               index % 7 === 5 ? 'border-indigo-200 bg-indigo-50' :
               'border-purple-200 bg-purple-50'
-            }`}
+            }`}>
               <div className="font-semibold">{d.workout.title.split(" ")[0]}{d.workout.title.includes("Conditioning") ? " (Cond/Core)" : ""}</div>
               <Separator className="my-2" />
               <div className="space-y-1">
@@ -426,7 +426,7 @@ export default function SixPackSite() {
             <div className="rounded-2xl p-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg"><Dumbbell className="w-5 h-5"/></div>
             <div>
               <h1 className="text-lg font-semibold leading-none">Curtis's Six‑Pack Transformation Program</h1>
-              <p className="text-xs text-muted-foreground">Custom plan for 6'3", 187 lbs • 5 workouts/week (4 Lifting + 1 Conditioning)</p>
+              <p className="text-xs text-muted-foreground">Custom plan for 6'3", 187 lbs • 5 workouts/week (4 Lifting + 1 Conditioning) • v1.0.0</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -527,7 +527,7 @@ export default function SixPackSite() {
       <footer className="border-t">
         <div className="max-w-6xl mx-auto px-4 py-4 text-xs text-muted-foreground flex items-center justify-between">
           <span>Curtis's Six‑Pack Program • 5‑day split • ~200g protein/day</span>
-          <span className="flex items-center gap-1"><Sun className="w-3 h-3"/> Built for consistency & clarity</span>
+          <span className="flex items-center gap-1"><Sun className="w-3 h-3"/> Built for consistency & clarity • v1.0.0</span>
         </div>
       </footer>
     </div>
