@@ -623,18 +623,18 @@ export default function SixPackSite() {
       </div>
 
       {/* Header / Hero */}
-      <header className="sticky top-0 z-30 backdrop-blur bg-white/70 border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <header className="sticky top-0 z-30 backdrop-blur bg-gradient-to-r from-blue-600 to-blue-800 border-b border-blue-700 shadow-lg">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button onClick={() => setMobileMenuOpen(true)} className="md:hidden p-2 hover:bg-gray-100 rounded-lg">
+            <button onClick={() => setMobileMenuOpen(true)} className="md:hidden p-2 hover:bg-blue-700 rounded-lg text-white">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
               </svg>
             </button>
-            <div className="w-9 h-9 rounded-2xl bg-gradient-to-r from-blue-600 to-blue-800 text-white grid place-content-center font-bold shadow-lg"><Dumbbell className="w-5 h-5"/></div>
+            <div className="w-10 h-10 rounded-2xl bg-white/20 text-white grid place-content-center font-bold shadow-lg backdrop-blur"><Dumbbell className="w-6 h-6"/></div>
             <div>
-              <h1 className="text-lg font-semibold leading-tight">Curtis's Six‑Pack Transformation Program</h1>
-              <p className="text-xs text-slate-500">Custom plan for 6'3", 187 lbs • 5 workouts/week (4 Lifting + 1 Conditioning) • v1.0.0</p>
+              <h1 className="text-xl font-bold leading-tight text-white">Curtis's Six‑Pack Transformation Program</h1>
+              <p className="text-sm text-blue-100">Custom plan for 6'3", 187 lbs • 5 workouts/week (4 Lifting + 1 Conditioning) • v1.0.0</p>
             </div>
           </div>
           
@@ -650,14 +650,14 @@ export default function SixPackSite() {
               { id: 'track', label: 'Trackers' },
               { id: 'download', label: 'Downloads' }
             ].map(tab => (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 ${activeTab === tab.id ? 'bg-blue-100 text-blue-700' : ''}`}>
+              <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`px-4 py-2 text-sm font-medium rounded-lg hover:bg-white/20 text-white ${activeTab === tab.id ? 'bg-white/30 text-white font-semibold' : ''}`}>
                 {tab.label}
               </button>
             ))}
           </nav>
           
           <div className="flex gap-2">
-            <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-2xl border border-slate-300 hover:bg-slate-50 px-4 py-2 text-sm font-medium">Print</button>
+            <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-2xl border border-white/30 hover:bg-white/20 px-4 py-2 text-sm font-medium text-white">Print</button>
           </div>
         </div>
       </header>
@@ -702,20 +702,37 @@ export default function SixPackSite() {
                   </label>
                 </div>
                 
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium">Water Intake</span>
-                    <span className="text-sm text-slate-500">{dailyHabits.water}/12 glasses</span>
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-medium text-blue-800">💧 Water Intake Tracker</span>
+                    <span className="text-sm text-blue-600 font-semibold">{dailyHabits.water}/12 glasses</span>
                   </div>
-                  <div className="flex gap-1 mb-2 flex-wrap">
+                  <div className="grid grid-cols-6 gap-2 mb-3">
                     {Array.from({ length: 12 }, (_, i) => (
-                      <button key={i} onClick={() => updateHabit('water', i + 1)} className={`w-6 h-6 rounded border-2 ${i < dailyHabits.water ? 'bg-blue-500 border-blue-500' : 'border-gray-300'}`}>
-                        {i < dailyHabits.water && <span className="text-white text-xs">💧</span>}
+                      <button 
+                        key={i} 
+                        onClick={() => updateHabit('water', i + 1)} 
+                        className={`w-8 h-8 rounded-full border-2 transition-all duration-200 flex items-center justify-center text-sm ${
+                          i < dailyHabits.water 
+                            ? 'bg-blue-500 border-blue-500 text-white shadow-md transform scale-110' 
+                            : 'border-blue-300 hover:border-blue-400 hover:bg-blue-100'
+                        }`}
+                      >
+                        {i < dailyHabits.water ? '💧' : '○'}
                       </button>
                     ))}
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-blue-500 h-2 rounded-full transition-all duration-300" style={{ width: `${(dailyHabits.water / 12) * 100}%` }}></div>
+                  <div className="w-full bg-blue-200 rounded-full h-3 mb-2">
+                    <div 
+                      className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500 flex items-center justify-end pr-2" 
+                      style={{ width: `${(dailyHabits.water / 12) * 100}%` }}
+                    >
+                      {dailyHabits.water > 0 && <span className="text-white text-xs font-bold">{Math.round((dailyHabits.water / 12) * 100)}%</span>}
+                    </div>
+                  </div>
+                  <div className="flex justify-between text-xs text-blue-600">
+                    <span>Target: 3-4L daily</span>
+                    <span>{dailyHabits.water >= 8 ? '✅ Great job!' : `${8 - dailyHabits.water} more to go!`}</span>
                   </div>
                 </div>
                 
@@ -833,8 +850,64 @@ export default function SixPackSite() {
         )}
 
         {activeTab === 'calendar' && (
-          <div className="space-y-3">
+          <div className="space-y-6">
             <SectionHeader icon={<CalendarDays />} title="Calendar (4 weeks)" desc="Minimalist overview" cta={<PrintButton />} />
+            
+            {/* Google Calendar Integration */}
+            <Card className="shadow-lg bg-white/90 backdrop-blur border-blue-200">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg text-blue-700 flex items-center gap-2">
+                  <CalendarDays className="w-5 h-5" />
+                  Google Calendar Integration
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-gray-600">Sync your workout schedule with Google Calendar to get reminders and track your progress.</p>
+                <div className="flex gap-3">
+                  <Button 
+                    onClick={() => {
+                      const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=Curtis's Six-Pack Workout&dates=${new Date().toISOString().split('T')[0].replace(/-/g, '')}T090000Z/${new Date().toISOString().split('T')[0].replace(/-/g, '')}T100000Z&details=Today's workout: ${days[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1]?.workout.title}&location=Gym`;
+                      window.open(calendarUrl, '_blank');
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    📅 Add Today's Workout to Google Calendar
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      const icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Curtis Six-Pack Program//EN
+BEGIN:VEVENT
+UID:${Date.now()}@curtissixpack.com
+DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z
+DTSTART:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z
+DTEND:${new Date(Date.now() + 3600000).toISOString().replace(/[-:]/g, '').split('.')[0]}Z
+SUMMARY:Curtis's Six-Pack Workout
+DESCRIPTION:${days[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1]?.workout.items.join(', ')}
+END:VEVENT
+END:VCALENDAR`;
+                      const blob = new Blob([icsContent], { type: 'text/calendar' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = 'workout-schedule.ics';
+                      a.click();
+                    }}
+                    variant="outline"
+                    className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                  >
+                    📥 Download .ics File
+                  </Button>
+                </div>
+                <div className="bg-blue-50 p-3 rounded-lg">
+                  <p className="text-xs text-blue-800">
+                    <strong>Tip:</strong> Use the .ics file to import the entire 12-week program into any calendar app (Google Calendar, Outlook, Apple Calendar, etc.)
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+            
             <CalendarView />
           </div>
         )}
