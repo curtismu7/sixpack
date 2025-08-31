@@ -425,7 +425,7 @@ export default function SixPackSite() {
           <div className="flex items-center gap-3">
             <div className="rounded-2xl p-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg"><Dumbbell className="w-5 h-5"/></div>
             <div>
-              <h1 className="text-lg font-semibold leading-none">Six‑Pack Transformation Program</h1>
+              <h1 className="text-lg font-semibold leading-none">Curtis's Six‑Pack Transformation Program</h1>
               <p className="text-xs text-muted-foreground">Custom plan for 6'3", 187 lbs • 5 workouts/week (4 Lifting + 1 Conditioning)</p>
             </div>
           </div>
@@ -526,7 +526,7 @@ export default function SixPackSite() {
 
       <footer className="border-t">
         <div className="max-w-6xl mx-auto px-4 py-4 text-xs text-muted-foreground flex items-center justify-between">
-          <span>Six‑Pack Program • 5‑day split • ~200g protein/day</span>
+          <span>Curtis's Six‑Pack Program • 5‑day split • ~200g protein/day</span>
           <span className="flex items-center gap-1"><Sun className="w-3 h-3"/> Built for consistency & clarity</span>
         </div>
       </footer>

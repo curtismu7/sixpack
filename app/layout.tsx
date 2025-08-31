@@ -5,7 +5,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Six-Pack Transformation Program',
+  title: 'Curtis\'s Six-Pack Transformation Program',
   description: 'Custom fitness plan for 6\'3", 187 lbs • 5 workouts/week (4 Lifting + 1 Conditioning)',
 }
 
