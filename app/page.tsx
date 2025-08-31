@@ -202,6 +202,146 @@ const DownloadButton = ({ href, label }: { href: string; label: string }) => (
   </a>
 );
 
+// Workout Timer Component
+function WorkoutTimer() {
+  const [time, setTime] = useState(0);
+  const [isRunning, setIsRunning] = useState(false);
+  const [mode, setMode] = useState<'workout' | 'rest'>('workout');
+  const [timerMode, setTimerMode] = useState<'workout' | 'rest'>('workout');
+
+  const workoutTime = 45;
+  const restTime = 15;
+
+  React.useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isRunning) {
+      interval = setInterval(() => {
+        setTime(time => time + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isRunning]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const startTimer = () => setIsRunning(true);
+  const pauseTimer = () => setIsRunning(false);
+  const resetTimer = () => { setTime(0); setIsRunning(false); };
+
+  return (
+    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <h3 className="text-xl font-semibold mb-4">Workout Timer</h3>
+      <div className="text-center">
+        <div className="text-6xl font-bold mb-4 font-mono">{formatTime(time)}</div>
+        <div className="text-lg font-medium mb-4 text-gray-600">
+          {isRunning ? `${timerMode === 'workout' ? 'Workout' : 'Rest'} Time` : 'Ready to Start'}
+        </div>
+        <div className="flex gap-3 justify-center mb-4">
+          <Button onClick={startTimer} disabled={isRunning} className="bg-green-600 hover:bg-green-700">Start</Button>
+          <Button onClick={pauseTimer} disabled={!isRunning} className="bg-yellow-600 hover:bg-yellow-700">Pause</Button>
+          <Button onClick={resetTimer} className="bg-red-600 hover:bg-red-700">Reset</Button>
+        </div>
+        <div className="flex gap-2 justify-center">
+          <Button onClick={() => setTimerMode('workout')} variant={timerMode === 'workout' ? 'default' : 'outline'} className="text-sm">Workout (45s)</Button>
+          <Button onClick={() => setTimerMode('rest')} variant={timerMode === 'rest' ? 'default' : 'outline'} className="text-sm">Rest (15s)</Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Meal Prep Calculator Component
+function MealPrepCalculator() {
+  const [servings, setServings] = useState(1);
+
+  return (
+    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <h3 className="text-xl font-semibold mb-4">Meal Prep Calculator</h3>
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium mb-2">Servings Needed</label>
+          <Input type="number" value={servings} onChange={(e) => setServings(Number(e.target.value))} min="1" max="20" />
+        </div>
+        <div className="space-y-2">
+          <h4 className="font-medium">Chicken & Quinoa Bowl ({servings} serving{servings > 1 ? 's' : ''}):</h4>
+          <div className="text-sm space-y-1 bg-gray-50 p-3 rounded-lg">
+            <div className="flex justify-between">
+              <span>Chicken breast:</span>
+              <span>{8 * servings} oz</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Quinoa (dry):</span>
+              <span>{(1/3 * servings).toFixed(1)} cup</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Broccoli:</span>
+              <span>{servings} cup{servings > 1 ? 's' : ''}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Olive oil:</span>
+              <span>{servings} tbsp</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Enhanced Grocery List Component
+function EnhancedGroceryList() {
+  const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
+  
+  const groceryItems = [
+    { category: 'Proteins', items: ['Chicken breast (2 lbs)', 'Salmon fillets (1 lb)', 'Ground turkey (1 lb)', 'Eggs (18 count)', 'Greek yogurt (32 oz)'] },
+    { category: 'Carbs & Grains', items: ['Quinoa (2 lbs)', 'Brown rice (2 lbs)', 'Sweet potatoes (3 lbs)', 'Oats (32 oz)'] },
+    { category: 'Vegetables & Fruits', items: ['Broccoli (2 lbs)', 'Spinach (5 oz bag)', 'Mixed berries (2 lbs)', 'Avocados (4 count)', 'Bell peppers (3 count)'] }
+  ];
+
+  const totalItems = groceryItems.reduce((sum, cat) => sum + cat.items.length, 0);
+  const checkedCount = Object.values(checkedItems).filter(Boolean).length;
+  const progress = Math.round((checkedCount / totalItems) * 100);
+
+  const toggleItem = (item: string) => {
+    setCheckedItems(prev => ({ ...prev, [item]: !prev[item] }));
+  };
+
+  return (
+    <div className="lg:col-span-2 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-xl font-semibold">Grocery Checklist</h3>
+        <span className="text-sm text-slate-500">{progress}% complete</span>
+      </div>
+      <div className="grid md:grid-cols-3 gap-6">
+        {groceryItems.map((category, catIndex) => (
+          <div key={category.category}>
+            <h4 className={`font-medium mb-3 ${catIndex === 0 ? 'text-pink-600' : catIndex === 1 ? 'text-blue-600' : 'text-green-600'}`}>
+              {category.category}
+            </h4>
+            <div className="space-y-2">
+              {category.items.map(item => (
+                <label key={item} className="flex items-center gap-3 cursor-pointer">
+                  <Checkbox checked={!!checkedItems[item]} onCheckedChange={() => toggleItem(item)} />
+                  <span className="text-sm">{item}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-4">
+        <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="bg-green-500 h-2 rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Weekly table component
 function WeeklyTable() {
   return (
@@ -417,105 +557,308 @@ function Downloads() {
 // 🌐 Page Layout
 // ---------------------------------------------
 export default function SixPackSite() {
+  const [activeTab, setActiveTab] = useState("tracker");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [dailyHabits, setDailyHabits] = useState({
+    workout: false,
+    protein: false,
+    water: 0,
+    sleep: false,
+    vegetables: false
+  });
+  const [dailyNotes, setDailyNotes] = useState("");
+
+  const updateHabit = (habit: string, value: boolean | number) => {
+    setDailyHabits(prev => ({ ...prev, [habit]: value }));
+  };
+
+  const updateBooleanHabit = (habit: string, checked: boolean | "indeterminate") => {
+    updateHabit(habit, checked === true);
+  };
+
+  const habitProgress = useMemo(() => {
+    const completed = Object.entries(dailyHabits).filter(([key, value]) => {
+      if (key === 'water') return (value as number) >= 8; // 8 glasses minimum
+      return value === true;
+    }).length;
+    return Math.round((completed / 5) * 100);
+  }, [dailyHabits]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onClick={() => setMobileMenuOpen(false)} />
+      )}
+      
+      {/* Mobile Menu */}
+      <div className={`fixed left-0 top-0 h-full w-80 bg-white shadow-xl z-50 transform transition-transform duration-300 md:hidden ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="p-4 border-b">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Quick Access</h2>
+            <button onClick={() => setMobileMenuOpen(false)} className="p-2 hover:bg-gray-100 rounded-lg">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div className="p-4 space-y-3 max-h-96 overflow-y-auto">
+          {[
+            { id: 'tracker', label: 'Today\'s Tracker', icon: 'T', color: 'pink' },
+            { id: 'tools', label: 'Interactive Tools', icon: '🛠', color: 'green' },
+            { id: 'weekly', label: 'Weekly Plan', icon: 'W', color: 'purple' },
+            { id: 'quick', label: 'Quick View', icon: 'Q', color: 'orange' },
+            { id: 'calendar', label: 'Calendar', icon: '📅', color: 'red' },
+            { id: 'grocery', label: 'Grocery', icon: '🛒', color: 'yellow' },
+            { id: 'track', label: 'Trackers', icon: '📊', color: 'indigo' },
+            { id: 'download', label: 'Downloads', icon: '📥', color: 'gray' }
+          ].map(tab => (
+            <button key={tab.id} onClick={() => { setActiveTab(tab.id); setMobileMenuOpen(false); }} className="w-full text-left p-3 hover:bg-gray-100 rounded-lg flex items-center gap-3">
+              <span className={`w-8 h-8 bg-${tab.color}-100 text-${tab.color}-700 rounded-lg flex items-center justify-center text-sm font-bold`}>{tab.icon}</span>
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Header / Hero */}
-      <header className="sticky top-0 z-30 backdrop-blur supports-[backdrop-filter]:bg-white/80 border-b border-green-200 shadow-sm">
+      <header className="sticky top-0 z-30 backdrop-blur bg-white/70 border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="rounded-2xl p-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg"><Dumbbell className="w-5 h-5"/></div>
+            <button onClick={() => setMobileMenuOpen(true)} className="md:hidden p-2 hover:bg-gray-100 rounded-lg">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+            </button>
+            <div className="w-9 h-9 rounded-2xl bg-gradient-to-r from-blue-600 to-blue-800 text-white grid place-content-center font-bold shadow-lg"><Dumbbell className="w-5 h-5"/></div>
             <div>
-              <h1 className="text-lg font-semibold leading-none">Curtis's Six‑Pack Transformation Program</h1>
-              <p className="text-xs text-muted-foreground">Custom plan for 6'3", 187 lbs • 5 workouts/week (4 Lifting + 1 Conditioning) • v1.0.0</p>
+              <h1 className="text-lg font-semibold leading-tight">Curtis's Six‑Pack Transformation Program</h1>
+              <p className="text-xs text-slate-500">Custom plan for 6'3", 187 lbs • 5 workouts/week (4 Lifting + 1 Conditioning) • v1.0.0</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <DownloadButton href={pdfLinks[0].href} label="Download Master PDF" />
-            <Button variant="outline" className="rounded-2xl border-2 border-blue-300 text-blue-700 hover:bg-blue-50 shadow-md" onClick={() => window.print()}>🖨️ Print</Button>
+          
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex gap-1 overflow-x-auto">
+            {[
+              { id: 'tracker', label: 'Today\'s Tracker' },
+              { id: 'tools', label: 'Tools' },
+              { id: 'weekly', label: 'Weekly Plan' },
+              { id: 'quick', label: 'Quick View' },
+              { id: 'calendar', label: 'Calendar' },
+              { id: 'grocery', label: 'Grocery' },
+              { id: 'track', label: 'Trackers' },
+              { id: 'download', label: 'Downloads' }
+            ].map(tab => (
+              <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 ${activeTab === tab.id ? 'bg-blue-100 text-blue-700' : ''}`}>
+                {tab.label}
+              </button>
+            ))}
+          </nav>
+          
+          <div className="flex gap-2">
+            <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-2xl border border-slate-300 hover:bg-slate-50 px-4 py-2 text-sm font-medium">Print</button>
           </div>
         </div>
       </header>
 
       {/* Content */}
-      <main className="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
-        <Card className="shadow-lg border-0 bg-white/80 backdrop-blur">
-          <CardHeader>
-            <CardTitle className="text-xl bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Overview</CardTitle>
-          </CardHeader>
-          <CardContent className="grid md:grid-cols-3 gap-4">
-            <div className="rounded-2xl border-2 border-green-200 p-4 bg-gradient-to-br from-green-50 to-emerald-50">
-              <SectionHeader icon={<Dumbbell className="text-green-600" />} title="Training Split" desc="5 days/week: 4 lifting + 1 conditioning & core" />
-              <ul className="list-disc ml-5 mt-3 text-sm space-y-1 text-green-800">
-                <li>Mon: Push</li>
-                <li>Tue: Pull</li>
-                <li>Wed: Legs & Core</li>
-                <li>Thu: Conditioning & Core</li>
-                <li>Fri: Push/Pull Hybrid</li>
-                <li>Sat: Active Recovery</li>
-                <li>Sun: Rest</li>
-              </ul>
+      <main className="max-w-6xl mx-auto p-4 md:p-6">
+        
+        {/* Today's Tracker Tab */}
+        {activeTab === 'tracker' && (
+          <div className="grid lg:grid-cols-2 gap-6">
+            {/* Today's Workout */}
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-semibold">Today's Workout</h3>
+                <span className="text-sm text-slate-500">{new Date().toLocaleDateString('en-US', { weekday: 'long' })}</span>
+              </div>
+              <div className="space-y-3">
+                {days[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1]?.workout.items.map((item, index) => (
+                  <div key={index} className="flex items-center gap-3">
+                    <Checkbox />
+                    <span className="text-sm">{item}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="rounded-2xl border-2 border-blue-200 p-4 bg-gradient-to-br from-blue-50 to-cyan-50">
-              <SectionHeader icon={<Salad className="text-blue-600" />} title="Nutrition Targets" desc="~2,400 kcal • 190–200g protein/day" />
-              <ul className="list-disc ml-5 mt-3 text-sm space-y-1 text-blue-800">
-                <li>Breakfast daily: eggs + Greek yogurt (no egg whites)</li>
-                <li>50–60g protein per main meal</li>
-                <li>Carbs higher on lift days, lower on rest days</li>
-                <li>Hydration: 3–4L/day • Sleep: 7–8h</li>
-              </ul>
+            
+            {/* Daily Habits */}
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h3 className="text-xl font-semibold mb-4">Daily Habits</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <Checkbox checked={dailyHabits.workout} onCheckedChange={(checked) => updateBooleanHabit('workout', checked)} />
+                    <span className="font-medium">Complete Workout</span>
+                  </label>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <Checkbox checked={dailyHabits.protein} onCheckedChange={(checked) => updateBooleanHabit('protein', checked)} />
+                    <span className="font-medium">Hit Protein Target (190-200g)</span>
+                  </label>
+                </div>
+                
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium">Water Intake</span>
+                    <span className="text-sm text-slate-500">{dailyHabits.water}/12 glasses</span>
+                  </div>
+                  <div className="flex gap-1 mb-2 flex-wrap">
+                    {Array.from({ length: 12 }, (_, i) => (
+                      <button key={i} onClick={() => updateHabit('water', i + 1)} className={`w-6 h-6 rounded border-2 ${i < dailyHabits.water ? 'bg-blue-500 border-blue-500' : 'border-gray-300'}`}>
+                        {i < dailyHabits.water && <span className="text-white text-xs">💧</span>}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="bg-blue-500 h-2 rounded-full transition-all duration-300" style={{ width: `${(dailyHabits.water / 12) * 100}%` }}></div>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <Checkbox checked={dailyHabits.sleep} onCheckedChange={(checked) => updateBooleanHabit('sleep', checked)} />
+                    <span className="font-medium">7-8 Hours Sleep</span>
+                  </label>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <Checkbox checked={dailyHabits.vegetables} onCheckedChange={(checked) => updateBooleanHabit('vegetables', checked)} />
+                    <span className="font-medium">5+ Servings Vegetables</span>
+                  </label>
+                </div>
+              </div>
+              
+              <div className="mt-6 pt-4 border-t">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium">Daily Progress</span>
+                  <span className="text-sm text-slate-500">{habitProgress}% complete</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div className="bg-pink-500 h-3 rounded-full transition-all duration-300" style={{ width: `${habitProgress}%` }}></div>
+                </div>
+              </div>
             </div>
-            <div className="rounded-2xl border-2 border-purple-200 p-4 bg-gradient-to-br from-purple-50 to-pink-50">
-              <SectionHeader icon={<CalendarDays className="text-purple-600" />} title="Tools" desc="Use Downloads or Print each section" />
-              <ul className="list-disc ml-5 mt-3 text-sm space-y-1 text-purple-800">
-                <li>Weekly plan & quick views</li>
-                <li>Grocery checklist</li>
-                <li>Trackers (weekly / 4‑week / 12‑week)</li>
-                <li>Calendar (4‑week minimalist)</li>
-              </ul>
+            
+            {/* Personal Notes */}
+            <div className="lg:col-span-2 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h3 className="text-xl font-semibold mb-4">Daily Notes</h3>
+              <textarea 
+                value={dailyNotes}
+                onChange={(e) => setDailyNotes(e.target.value)}
+                placeholder="How are you feeling today? Any observations about your workout, energy, or progress..."
+                className="w-full h-32 p-4 border border-gray-200 rounded-lg resize-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+              />
+              <div className="flex justify-between items-center mt-2">
+                <span className="text-xs text-gray-500">Auto-saves as you type</span>
+                <span className="text-xs text-green-600 opacity-0">Saved ✓</span>
+              </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        )}
 
-        <Tabs defaultValue="weekly" className="space-y-4">
-          <TabsList className="grid grid-cols-2 md:grid-cols-6 gap-2 bg-gradient-to-r from-green-100 to-blue-100 p-1 rounded-2xl shadow-md">
-            <TabsTrigger value="weekly">Weekly Plan</TabsTrigger>
-            <TabsTrigger value="quick">Quick View</TabsTrigger>
-            <TabsTrigger value="calendar">Calendar</TabsTrigger>
-            <TabsTrigger value="grocery">Grocery</TabsTrigger>
-            <TabsTrigger value="track">Trackers</TabsTrigger>
-            <TabsTrigger value="download">Downloads</TabsTrigger>
-          </TabsList>
+        {/* Interactive Tools Tab */}
+        {activeTab === 'tools' && (
+          <div className="grid lg:grid-cols-2 gap-6">
+            {/* Workout Timer */}
+            <WorkoutTimer />
+            
+            {/* Meal Prep Calculator */}
+            <MealPrepCalculator />
+            
+            {/* Enhanced Grocery Progress */}
+            <EnhancedGroceryList />
+          </div>
+        )}
 
-          <TabsContent value="weekly" className="space-y-3">
+        {/* Overview Tab */}
+        {activeTab === 'overview' && (
+          <Card className="shadow-lg border-0 bg-white/80 backdrop-blur">
+            <CardHeader>
+              <CardTitle className="text-xl bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Overview</CardTitle>
+            </CardHeader>
+            <CardContent className="grid md:grid-cols-3 gap-4">
+              <div className="rounded-2xl border-2 border-green-200 p-4 bg-gradient-to-br from-green-50 to-emerald-50">
+                <SectionHeader icon={<Dumbbell className="text-green-600" />} title="Training Split" desc="5 days/week: 4 lifting + 1 conditioning & core" />
+                <ul className="list-disc ml-5 mt-3 text-sm space-y-1 text-green-800">
+                  <li>Mon: Push</li>
+                  <li>Tue: Pull</li>
+                  <li>Wed: Legs & Core</li>
+                  <li>Thu: Conditioning & Core</li>
+                  <li>Fri: Push/Pull Hybrid</li>
+                  <li>Sat: Active Recovery</li>
+                  <li>Sun: Rest</li>
+                </ul>
+              </div>
+              <div className="rounded-2xl border-2 border-blue-200 p-4 bg-gradient-to-br from-blue-50 to-cyan-50">
+                <SectionHeader icon={<Salad className="text-blue-600" />} title="Nutrition Targets" desc="~2,400 kcal • 190–200g protein/day" />
+                <ul className="list-disc ml-5 mt-3 text-sm space-y-1 text-blue-800">
+                  <li>Breakfast daily: eggs + Greek yogurt (no egg whites)</li>
+                  <li>50–60g protein per main meal</li>
+                  <li>Carbs higher on lift days, lower on rest days</li>
+                  <li>Hydration: 3–4L/day • Sleep: 7–8h</li>
+                </ul>
+              </div>
+              <div className="rounded-2xl border-2 border-purple-200 p-4 bg-gradient-to-br from-purple-50 to-pink-50">
+                <SectionHeader icon={<CalendarDays className="text-purple-600" />} title="Tools" desc="Use Downloads or Print each section" />
+                <ul className="list-disc ml-5 mt-3 text-sm space-y-1 text-purple-800">
+                  <li>Weekly plan & quick views</li>
+                  <li>Grocery checklist</li>
+                  <li>Trackers (weekly / 4‑week / 12‑week)</li>
+                  <li>Calendar (4‑week minimalist)</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Existing Tabs */}
+        {activeTab === 'weekly' && (
+          <div className="space-y-3">
             <SectionHeader icon={<Dumbbell />} title="Weekly Plan" desc="Meals + workouts for each day" cta={<PrintButton />} />
             <WeeklyTable />
-          </TabsContent>
+          </div>
+        )}
 
-          <TabsContent value="quick" className="space-y-3">
+        {activeTab === 'quick' && (
+          <div className="space-y-3">
             <SectionHeader icon={<CheckSquare />} title="Quick View" desc="Short meal labels for gym use" cta={<PrintButton />} />
             <QuickView />
-          </TabsContent>
+          </div>
+        )}
 
-          <TabsContent value="calendar" className="space-y-3">
+        {activeTab === 'calendar' && (
+          <div className="space-y-3">
             <SectionHeader icon={<CalendarDays />} title="Calendar (4 weeks)" desc="Minimalist overview" cta={<PrintButton />} />
             <CalendarView />
-          </TabsContent>
+          </div>
+        )}
 
-          <TabsContent value="grocery" className="space-y-3">
+        {activeTab === 'grocery' && (
+          <div className="space-y-3">
             <SectionHeader icon={<ListChecks />} title="Grocery Checklist" desc="Tap to tick items (not saved after refresh)" cta={<PrintButton />} />
             <GroceryList />
-          </TabsContent>
+          </div>
+        )}
 
-          <TabsContent value="track" className="space-y-3">
+        {activeTab === 'track' && (
+          <div className="space-y-3">
             <SectionHeader icon={<FileText />} title="Trackers" desc="Print and check off daily meals & workouts" cta={<PrintButton />} />
             <Trackers />
-          </TabsContent>
+          </div>
+        )}
 
-          <TabsContent value="download" className="space-y-3">
+        {activeTab === 'download' && (
+          <div className="space-y-3">
             <SectionHeader icon={<Download />} title="Downloads" desc="PDFs matching all sections" />
             <Downloads />
-          </TabsContent>
-        </Tabs>
+          </div>
+        )}
 
         <Card className="shadow-lg bg-white/90 backdrop-blur border-yellow-200">
           <CardContent className="text-xs text-yellow-800 p-4">
