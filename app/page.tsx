@@ -478,25 +478,81 @@ function GroceryList() {
 }
 
 function Trackers() {
+  const [weeklyTracking, setWeeklyTracking] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('curtis-weekly-tracking');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    }
+    // Initialize with empty tracking for each day
+    const initial: Record<string, Record<string, boolean>> = {};
+    days.forEach(day => {
+      initial[day.day] = {
+        breakfast: false,
+        lunch: false,
+        dinner: false,
+        snacks: false
+      };
+    });
+    return initial;
+  });
+
+  const updateTracking = (day: string, meal: string, checked: boolean) => {
+    const updated = {
+      ...weeklyTracking,
+      [day]: {
+        ...weeklyTracking[day],
+        [meal]: checked
+      }
+    };
+    setWeeklyTracking(updated);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('curtis-weekly-tracking', JSON.stringify(updated));
+    }
+  };
+
+  const getCompletionPercentage = () => {
+    const totalMeals = days.length * 4; // 4 meals per day
+    const completedMeals = Object.values(weeklyTracking).reduce((total: number, dayTracking: any) => {
+      return total + Object.values(dayTracking).filter(Boolean).length;
+    }, 0);
+    return Math.round((completedMeals / totalMeals) * 100);
+  };
+
   const weekRows = days.map((d) => ({ day: d.day, workout: d.workout.title }));
+  
   return (
     <div className="space-y-4">
       <Card className="shadow-lg bg-white/90 backdrop-blur border-indigo-200">
         <CardHeader className="pb-2 flex flex-row items-center justify-between">
-          <CardTitle className="text-lg text-indigo-700">Weekly Tracking Sheet</CardTitle>
+          <div>
+            <CardTitle className="text-lg text-indigo-700">Weekly Tracking Sheet</CardTitle>
+            <p className="text-sm text-indigo-600 mt-1">Weekly completion: {getCompletionPercentage()}%</p>
+          </div>
           <PrintButton />
         </CardHeader>
         <CardContent>
+          <div className="mb-4">
+            <div className="w-full bg-indigo-200 rounded-full h-3">
+              <div 
+                className="bg-gradient-to-r from-indigo-500 to-indigo-600 h-3 rounded-full transition-all duration-500 flex items-center justify-end pr-2" 
+                style={{ width: `${getCompletionPercentage()}%` }}
+              >
+                {getCompletionPercentage() > 0 && <span className="text-white text-xs font-bold">{getCompletionPercentage()}%</span>}
+              </div>
+            </div>
+          </div>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Day</TableHead>
                   <TableHead>Workout</TableHead>
-                  <TableHead>Breakfast</TableHead>
-                  <TableHead>Lunch</TableHead>
-                  <TableHead>Dinner</TableHead>
-                  <TableHead>Snacks</TableHead>
+                  <TableHead className="text-center">Breakfast</TableHead>
+                  <TableHead className="text-center">Lunch</TableHead>
+                  <TableHead className="text-center">Dinner</TableHead>
+                  <TableHead className="text-center">Snacks</TableHead>
                   <TableHead>Notes</TableHead>
                 </TableRow>
               </TableHeader>
@@ -504,16 +560,55 @@ function Trackers() {
                 {weekRows.map((r) => (
                   <TableRow key={r.day}>
                     <TableCell className="font-medium">{r.day}</TableCell>
-                    <TableCell>{r.workout}</TableCell>
-                    <TableCell>☐</TableCell>
-                    <TableCell>☐</TableCell>
-                    <TableCell>☐</TableCell>
-                    <TableCell>☐</TableCell>
-                    <TableCell></TableCell>
+                    <TableCell className="text-sm">{r.workout}</TableCell>
+                    <TableCell className="text-center">
+                      <Checkbox 
+                        checked={weeklyTracking[r.day]?.breakfast || false}
+                        onCheckedChange={(checked) => updateTracking(r.day, 'breakfast', checked === true)}
+                        className="w-6 h-6 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                      />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Checkbox 
+                        checked={weeklyTracking[r.day]?.lunch || false}
+                        onCheckedChange={(checked) => updateTracking(r.day, 'lunch', checked === true)}
+                        className="w-6 h-6 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                      />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Checkbox 
+                        checked={weeklyTracking[r.day]?.dinner || false}
+                        onCheckedChange={(checked) => updateTracking(r.day, 'dinner', checked === true)}
+                        className="w-6 h-6 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                      />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Checkbox 
+                        checked={weeklyTracking[r.day]?.snacks || false}
+                        onCheckedChange={(checked) => updateTracking(r.day, 'snacks', checked === true)}
+                        className="w-6 h-6 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input 
+                        placeholder="Add notes..."
+                        className="text-xs h-8"
+                        defaultValue={localStorage.getItem(`curtis-notes-${r.day}`) || ''}
+                        onChange={(e) => {
+                          if (typeof window !== 'undefined') {
+                            localStorage.setItem(`curtis-notes-${r.day}`, e.target.value);
+                          }
+                        }}
+                      />
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
+          </div>
+          <div className="mt-4 text-xs text-gray-600 bg-gray-50 p-3 rounded-lg">
+            <p><strong>💾 Auto-Save:</strong> Your progress is automatically saved to your browser's local storage.</p>
+            <p><strong>🎯 Goal:</strong> Check off each meal as you complete it throughout the week.</p>
           </div>
         </CardContent>
       </Card>
@@ -559,17 +654,38 @@ function Downloads() {
 export default function SixPackSite() {
   const [activeTab, setActiveTab] = useState("tracker");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [dailyHabits, setDailyHabits] = useState({
-    workout: false,
-    protein: false,
-    water: 0,
-    sleep: false,
-    vegetables: false
+  const [dailyHabits, setDailyHabits] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const today = new Date().toDateString();
+      const saved = localStorage.getItem(`curtis-daily-habits-${today}`);
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    }
+    return {
+      workout: false,
+      protein: false,
+      water: 0,
+      sleep: false,
+      vegetables: false
+    };
   });
-  const [dailyNotes, setDailyNotes] = useState("");
+  
+  const [dailyNotes, setDailyNotes] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const today = new Date().toDateString();
+      return localStorage.getItem(`curtis-daily-notes-${today}`) || '';
+    }
+    return '';
+  });
 
   const updateHabit = (habit: string, value: boolean | number) => {
-    setDailyHabits(prev => ({ ...prev, [habit]: value }));
+    const updated = { ...dailyHabits, [habit]: value };
+    setDailyHabits(updated);
+    if (typeof window !== 'undefined') {
+      const today = new Date().toDateString();
+      localStorage.setItem(`curtis-daily-habits-${today}`, JSON.stringify(updated));
+    }
   };
 
   const updateBooleanHabit = (habit: string, checked: boolean | "indeterminate") => {
@@ -675,12 +791,25 @@ export default function SixPackSite() {
                 <span className="text-sm text-slate-500">{new Date().toLocaleDateString('en-US', { weekday: 'long' })}</span>
               </div>
               <div className="space-y-3">
-                {days[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1]?.workout.items.map((item, index) => (
-                  <div key={index} className="flex items-center gap-3">
-                    <Checkbox />
-                    <span className="text-sm">{item}</span>
-                  </div>
-                ))}
+                {days[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1]?.workout.items.map((item, index) => {
+                  const workoutKey = `workout-${new Date().toDateString()}-${index}`;
+                  const isChecked = typeof window !== 'undefined' ? localStorage.getItem(workoutKey) === 'true' : false;
+                  
+                  return (
+                    <div key={index} className="flex items-center gap-3">
+                      <Checkbox 
+                        defaultChecked={isChecked}
+                        onCheckedChange={(checked) => {
+                          if (typeof window !== 'undefined') {
+                            localStorage.setItem(workoutKey, checked ? 'true' : 'false');
+                          }
+                        }}
+                        className="w-6 h-6 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                      />
+                      <span className="text-sm">{item}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
             
@@ -690,14 +819,22 @@ export default function SixPackSite() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <label className="flex items-center gap-3 cursor-pointer">
-                    <Checkbox checked={dailyHabits.workout} onCheckedChange={(checked) => updateBooleanHabit('workout', checked)} />
+                    <Checkbox 
+                      checked={dailyHabits.workout} 
+                      onCheckedChange={(checked) => updateBooleanHabit('workout', checked)}
+                      className="w-6 h-6 data-[state=checked]:bg-pink-600 data-[state=checked]:border-pink-600"
+                    />
                     <span className="font-medium">Complete Workout</span>
                   </label>
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <label className="flex items-center gap-3 cursor-pointer">
-                    <Checkbox checked={dailyHabits.protein} onCheckedChange={(checked) => updateBooleanHabit('protein', checked)} />
+                    <Checkbox 
+                      checked={dailyHabits.protein} 
+                      onCheckedChange={(checked) => updateBooleanHabit('protein', checked)}
+                      className="w-6 h-6 data-[state=checked]:bg-pink-600 data-[state=checked]:border-pink-600"
+                    />
                     <span className="font-medium">Hit Protein Target (190-200g)</span>
                   </label>
                 </div>
@@ -738,14 +875,22 @@ export default function SixPackSite() {
                 
                 <div className="flex items-center justify-between">
                   <label className="flex items-center gap-3 cursor-pointer">
-                    <Checkbox checked={dailyHabits.sleep} onCheckedChange={(checked) => updateBooleanHabit('sleep', checked)} />
+                    <Checkbox 
+                      checked={dailyHabits.sleep} 
+                      onCheckedChange={(checked) => updateBooleanHabit('sleep', checked)}
+                      className="w-6 h-6 data-[state=checked]:bg-pink-600 data-[state=checked]:border-pink-600"
+                    />
                     <span className="font-medium">7-8 Hours Sleep</span>
                   </label>
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <label className="flex items-center gap-3 cursor-pointer">
-                    <Checkbox checked={dailyHabits.vegetables} onCheckedChange={(checked) => updateBooleanHabit('vegetables', checked)} />
+                    <Checkbox 
+                      checked={dailyHabits.vegetables} 
+                      onCheckedChange={(checked) => updateBooleanHabit('vegetables', checked)}
+                      className="w-6 h-6 data-[state=checked]:bg-pink-600 data-[state=checked]:border-pink-600"
+                    />
                     <span className="font-medium">5+ Servings Vegetables</span>
                   </label>
                 </div>
@@ -767,7 +912,13 @@ export default function SixPackSite() {
               <h3 className="text-xl font-semibold mb-4">Daily Notes</h3>
               <textarea 
                 value={dailyNotes}
-                onChange={(e) => setDailyNotes(e.target.value)}
+                onChange={(e) => {
+                  setDailyNotes(e.target.value);
+                  if (typeof window !== 'undefined') {
+                    const today = new Date().toDateString();
+                    localStorage.setItem(`curtis-daily-notes-${today}`, e.target.value);
+                  }
+                }}
                 placeholder="How are you feeling today? Any observations about your workout, energy, or progress..."
                 className="w-full h-32 p-4 border border-gray-200 rounded-lg resize-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
               />
